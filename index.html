@@ -176,6 +176,20 @@
                             max: 15,
                             ticks: {
                                 font: { size: 14 }
+                            },
+                            grid: {
+                                color: function(context) {
+                                    if (context.tick.value === 0) {
+                                        return 'rgba(0, 0, 0, 0.5)'; // y=0の線を濃い灰色に
+                                    }
+                                    return 'rgba(0, 0, 0, 0.1)'; // その他のグリッド線
+                                },
+                                lineWidth: function(context) {
+                                    if (context.tick.value === 0) {
+                                        return 2; // y=0の線を太く
+                                    }
+                                    return 1; // その他のグリッド線は通常の太さ
+                                }
                             }
                         }
                     },
@@ -228,7 +242,6 @@
             label.className = 'velocity-label';
             label.style.top = `${(y1 + y2) / 2}px`;
             
-            // Alternate left positioning based on velocity direction
             if (v1 >= 0) {
                 label.style.left = (arrows.length % 3 === 0) ? '120px' : 
                                    (arrows.length % 3 === 1) ? '150px' : '180px';
@@ -237,17 +250,17 @@
                                    (arrows.length % 3 === 1) ? '270px' : '300px';
             }
             
-            // Split labels vertically to prevent overlap
+            const deltaV = -g * (t2 - t1);
+
             label.innerHTML = `
                 <tspan x="0" dy="0">v = ${v1.toFixed(1)} m/s</tspan>
-                <tspan x="0" dy="15">Δv = ${(v2 - v1).toFixed(1)} m/s</tspan>
+                <tspan x="0" dy="15">Δv = ${deltaV.toFixed(2)} m/s</tspan>
             `;
             
             document.getElementById('simulation').appendChild(arrow);
             document.getElementById('simulation').appendChild(label);
             arrows.push(arrow, label);
             
-            // Limit number of arrows to prevent screen clutter
             if (arrows.length > 12) {
                 const oldArrow = arrows.shift();
                 const oldLabel = arrows.shift();
